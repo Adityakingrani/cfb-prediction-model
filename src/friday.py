@@ -212,7 +212,18 @@ def main():
     out["win_pct"] = (out["win_pct"] * 100).round(1)
     out["pick_margin"] = out["pick_margin"].round(1)
     out["market_spread"] = out["market_spread"].round(1)
-    out.rename(columns={"flag": "disagrees_with_market"}).to_csv(path, index=False)
+    out = out.rename(columns={"flag": "disagrees_with_market"})
+    # keep the original pre-game predictions for games already played this week,
+    # so a mid-week rerun never erases them (needed for grading)
+    if os.path.exists(path):
+        old = pd.read_csv(path)
+        kept = old[~old["game_id"].isin(out["game_id"])]
+        if len(kept):
+            print(f"Kept {len(kept)} earlier prediction(s) for games already played")
+            out = pd.concat([kept, out], ignore_index=True)
+            out["_k"] = pd.to_datetime(out["kickoff"], format="%Y-%m-%d %I:%M %p", errors="coerce")
+            out = out.sort_values("_k").drop(columns="_k")
+    out.to_csv(path, index=False)
     summary = {"season": int(season), "label": label.title(), "file": os.path.basename(path),
                "generated": now, "model_right": mr, "model_games": mn,
                "market_right": kr, "market_games": kn}
