@@ -1,54 +1,50 @@
 kickoff,away,home,pick,win_pct,pick_margin,market_spread,conf,disagrees_with_market,neutral,game_id
-2026-10-21 08:00 PM,New Mexico State,Sam Houston,New Mexico State,53.2,1.3,2.5,LOW,False,False,401871070
-2026-10-22 07:00 PM,James Madison,App State,James Madison,81.8,14.6,10.5,HIGH,False,False,401869845
-2026-10-22 07:00 PM,Liberty,Kennesaw State,Liberty,86.2,17.6,10.0,HIGH,False,False,401871056
-2026-10-22 07:30 PM,East Carolina,Memphis,Memphis,77.8,12.3,-10.0,HIGH,False,False,401862807
-2026-10-23 07:00 PM,Duke,Virginia,Duke,50.0,0.0,-1.5,LOW,True,False,401858271
+2026-10-23 07:00 PM,Duke,Virginia,Duke,50.0,0.0,-2.5,LOW,True,False,401858271
 2026-10-23 07:00 PM,Massachusetts,UConn,UConn,82.9,15.3,-14.5,HIGH,False,False,401861965
-2026-10-23 08:30 PM,Army,Tulsa,Tulsa,51.2,0.5,-1.8,LOW,False,False,401862808
-2026-10-23 09:00 PM,Air Force,Wyoming,Air Force,66.1,6.7,5.2,MED,False,False,401864525
-2026-10-23 10:30 PM,NC State,Stanford,NC State,67.6,7.3,6.5,MED,False,False,401858272
-2026-10-24 12:00 PM,California,SMU,SMU,81.2,14.3,-19.8,HIGH,False,False,401858270
-2026-10-24 12:00 PM,Indiana,Michigan,Indiana,70.9,8.9,7.0,MED,False,False,401858496
-2026-10-24 12:00 PM,LSU,Auburn,LSU,77.1,12.0,7.2,HIGH,False,False,401856728
-2026-10-24 12:00 PM,Pittsburgh,Miami,Miami,89.3,20.0,-19.5,HIGH,False,False,401858274
-2026-10-24 12:00 PM,Rice,Florida Atlantic,Florida Atlantic,73.8,10.3,-7.2,MED,False,False,401862809
-2026-10-24 12:00 PM,Rutgers,Northwestern,Northwestern,87.4,18.4,-16.2,HIGH,False,False,401858498
-2026-10-24 12:00 PM,Texas Tech,Cincinnati,Texas Tech,87.6,18.6,10.5,HIGH,False,False,401856840
-2026-10-24 12:00 PM,West Virginia,TCU,TCU,82.5,15.1,-9.5,HIGH,False,False,401856841
-2026-10-24 12:00 PM,Western Michigan,Toledo,Toledo,59.6,3.9,-3.0,LOW,False,False,401866450
+2026-10-23 08:30 PM,Army,Tulsa,Tulsa,51.2,0.5,-1.5,LOW,False,False,401862808
+2026-10-23 09:00 PM,Air Force,Wyoming,Air Force,66.1,6.7,5.5,MED,False,False,401864525
+2026-10-23 10:30 PM,NC State,Stanford,NC State,67.6,7.4,7.2,MED,False,False,401858272
+2026-10-24 12:00 PM,California,SMU,SMU,81.2,14.3,-18.8,HIGH,False,False,401858270
+2026-10-24 12:00 PM,Indiana,Michigan,Indiana,70.9,8.8,7.2,MED,False,False,401858496
+2026-10-24 12:00 PM,LSU,Auburn,LSU,77.1,12.0,7.0,HIGH,False,False,401856728
+2026-10-24 12:00 PM,Pittsburgh,Miami,Miami,89.3,20.0,-19.8,HIGH,False,False,401858274
+2026-10-24 12:00 PM,Rice,Florida Atlantic,Florida Atlantic,73.8,10.3,-7.8,MED,False,False,401862809
+2026-10-24 12:00 PM,Rutgers,Northwestern,Northwestern,87.4,18.4,-16.5,HIGH,False,False,401858498
+2026-10-24 12:00 PM,Texas Tech,Cincinnati,Texas Tech,87.6,18.6,11.5,HIGH,False,False,401856840
+2026-10-24 12:00 PM,West Virginia,TCU,TCU,82.5,15.1,-11.2,HIGH,False,False,401856841
+2026-10-24 12:00 PM,Western Michigan,Toledo,Toledo,59.6,3.9,-3.2,LOW,False,False,401866450
 2026-10-24 01:00 PM,Akron,Kent State,Kent State,60.5,4.3,-3.0,MED,False,False,401866446
-2026-10-24 01:00 PM,Baylor,Kansas,Baylor,51.1,0.5,3.0,LOW,False,False,401856834
-2026-10-24 01:00 PM,Miami (OH),Central Michigan,Central Michigan,57.2,2.9,2.5,LOW,True,False,401866476
-2026-10-24 03:00 PM,Oregon,Illinois,Oregon,79.2,13.1,9.5,HIGH,False,False,401858495
-2026-10-24 03:30 PM,BYU,UCF,BYU,73.3,10.0,6.5,MED,False,False,401856835
-2026-10-24 03:30 PM,Boston College,Georgia Tech,Georgia Tech,69.5,8.2,-4.0,MED,False,False,401858273
+2026-10-24 01:00 PM,Baylor,Kansas,Baylor,51.1,0.5,2.5,LOW,False,False,401856834
+2026-10-24 01:00 PM,Miami (OH),Central Michigan,Central Michigan,57.2,2.9,3.0,LOW,True,False,401866476
+2026-10-24 03:00 PM,Oregon,Illinois,Oregon,79.2,13.1,9.2,HIGH,False,False,401858495
+2026-10-24 03:30 PM,BYU,UCF,BYU,73.3,10.0,7.0,MED,False,False,401856835
+2026-10-24 03:30 PM,Boston College,Georgia Tech,Georgia Tech,69.5,8.2,-5.5,MED,False,False,401858273
 2026-10-24 03:30 PM,Bowling Green,Buffalo,Buffalo,68.7,7.8,-3.0,MED,False,False,401866448
 2026-10-24 03:30 PM,Hawai'i,Northern Illinois,Hawai'i,53.5,1.4,4.0,LOW,False,False,401864526
-2026-10-24 03:30 PM,Iowa,Minnesota,Iowa,74.3,10.5,6.5,MED,False,False,401858497
-2026-10-24 03:30 PM,Michigan State,UCLA,UCLA,76.1,11.4,-14.0,HIGH,False,False,401858499
-2026-10-24 03:30 PM,North Texas,Navy,North Texas,65.8,6.5,2.5,MED,False,False,401862810
-2026-10-24 03:30 PM,Oklahoma,Mississippi State,Oklahoma,56.4,2.6,4.5,LOW,False,False,401856730
-2026-10-24 03:30 PM,Sacramento State,Ball State,Ball State,68.0,7.6,-14.2,MED,False,False,401866447
-2026-10-24 03:30 PM,Tennessee,South Carolina,Tennessee,54.7,1.9,-2.5,LOW,True,False,401856731
-2026-10-24 03:30 PM,Texas A&M,Alabama,Alabama,82.3,14.9,-13.8,HIGH,False,False,401856727
-2026-10-24 03:45 PM,Kansas State,Arizona State,Kansas State,68.2,7.6,3.5,MED,False,False,401856839
-2026-10-24 04:00 PM,Eastern Michigan,Ohio,Ohio,80.2,13.7,-12.2,HIGH,False,False,401866449
-2026-10-24 04:00 PM,UL Monroe,Troy,Troy,83.9,16.0,-14.5,HIGH,False,False,401871094
-2026-10-24 05:00 PM,Louisiana,Southern Miss,Louisiana,75.2,11.0,10.0,HIGH,False,False,401869967
-2026-10-24 05:00 PM,Old Dominion,Louisiana Tech,Louisiana Tech,76.0,11.4,-12.5,HIGH,False,False,401871093
-2026-10-24 05:00 PM,San José State,Nevada,Nevada,71.0,8.9,-5.2,MED,False,False,401864528
-2026-10-24 06:00 PM,Boise State,Washington State,Boise State,82.4,15.0,13.2,HIGH,False,False,401860907
+2026-10-24 03:30 PM,Iowa,Minnesota,Iowa,74.3,10.5,7.0,MED,False,False,401858497
+2026-10-24 03:30 PM,Michigan State,UCLA,UCLA,76.1,11.4,-14.5,HIGH,False,False,401858499
+2026-10-24 03:30 PM,North Texas,Navy,North Texas,65.8,6.6,2.5,MED,False,False,401862810
+2026-10-24 03:30 PM,Oklahoma,Mississippi State,Oklahoma,56.4,2.6,3.0,LOW,False,False,401856730
+2026-10-24 03:30 PM,Sacramento State,Ball State,Ball State,68.0,7.6,-14.5,MED,False,False,401866447
+2026-10-24 03:30 PM,Tennessee,South Carolina,Tennessee,54.7,1.9,-2.2,LOW,True,False,401856731
+2026-10-24 03:30 PM,Texas A&M,Alabama,Alabama,82.3,14.9,-13.5,HIGH,False,False,401856727
+2026-10-24 03:45 PM,Kansas State,Arizona State,Kansas State,68.2,7.6,2.5,MED,False,False,401856839
+2026-10-24 04:00 PM,Eastern Michigan,Ohio,Ohio,80.2,13.7,-11.5,HIGH,False,False,401866449
+2026-10-24 04:00 PM,UL Monroe,Troy,Troy,83.9,16.0,-13.5,HIGH,False,False,401871094
+2026-10-24 05:00 PM,Louisiana,Southern Miss,Louisiana,75.2,11.0,9.8,HIGH,False,False,401869967
+2026-10-24 05:00 PM,Old Dominion,Louisiana Tech,Louisiana Tech,76.1,11.4,-13.5,HIGH,False,False,401871093
+2026-10-24 05:00 PM,San José State,Nevada,Nevada,71.0,8.9,-6.8,MED,False,False,401864528
+2026-10-24 06:00 PM,Boise State,Washington State,Boise State,82.4,15.0,13.5,HIGH,False,False,401860907
 2026-10-24 06:30 PM,San Diego State,Colorado State,San Diego State,61.3,4.6,1.2,MED,False,False,401860905
-2026-10-24 07:00 PM,Colorado,Oklahoma State,Oklahoma State,65.3,6.3,-13.0,MED,False,False,401856836
-2026-10-24 07:00 PM,Georgia State,Arkansas State,Arkansas State,50.9,0.4,2.2,LOW,True,False,401869935
-2026-10-24 07:00 PM,Virginia Tech,Clemson,Clemson,67.0,7.1,-2.8,MED,False,False,401858276
-2026-10-24 07:30 PM,Iowa State,Arizona,Arizona,73.7,10.2,-10.0,MED,False,False,401856838
-2026-10-24 07:30 PM,Ole Miss,Texas,Texas,60.6,4.3,-3.5,MED,False,False,401856732
-2026-10-24 07:30 PM,Syracuse,North Carolina,North Carolina,77.0,11.9,-7.5,HIGH,False,False,401858275
+2026-10-24 07:00 PM,Colorado,Oklahoma State,Oklahoma State,65.3,6.3,-13.5,MED,False,False,401856836
+2026-10-24 07:00 PM,Georgia State,Arkansas State,Arkansas State,50.9,0.4,2.5,LOW,True,False,401869935
+2026-10-24 07:00 PM,Virginia Tech,Clemson,Clemson,67.0,7.1,-2.5,MED,False,False,401858276
+2026-10-24 07:30 PM,Iowa State,Arizona,Arizona,73.7,10.2,-9.8,MED,False,False,401856838
+2026-10-24 07:30 PM,Ole Miss,Texas,Texas,60.6,4.3,-3.2,MED,False,False,401856732
+2026-10-24 07:30 PM,Syracuse,North Carolina,North Carolina,77.0,11.9,-9.5,HIGH,False,False,401858275
 2026-10-24 07:30 PM,USC,Wisconsin,USC,64.0,5.8,3.0,MED,False,False,401858500
-2026-10-24 07:30 PM,Utah State,Texas State,Texas State,68.9,7.9,-13.5,MED,False,False,401860906
-2026-10-24 07:30 PM,Vanderbilt,Kentucky,Kentucky,79.0,13.0,-10.5,HIGH,False,False,401856729
-2026-10-24 08:00 PM,UTSA,Tulane,UTSA,53.0,1.2,2.5,LOW,False,False,401862811
+2026-10-24 07:30 PM,Utah State,Texas State,Texas State,68.8,7.9,-13.5,MED,False,False,401860906
+2026-10-24 07:30 PM,Vanderbilt,Kentucky,Kentucky,79.0,13.0,-10.8,HIGH,False,False,401856729
+2026-10-24 08:00 PM,UTSA,Tulane,UTSA,53.0,1.2,3.0,LOW,False,False,401862811
 2026-10-24 10:00 PM,North Dakota State,New Mexico,New Mexico,58.8,3.6,-4.5,LOW,False,False,401864527
 2026-10-24 10:15 PM,Houston,Utah,Utah,67.8,7.5,-6.5,MED,False,False,401856837
