@@ -34,6 +34,13 @@ FEATURES = ["in_margin_w", "in_ppa_edge_w", "in_sr_edge_w",
             "pr_margin_w", "pr_ppa_edge_w", "pr_sp_w", "pr_ret_ppa_w", "pr_talent_w", "pr_rec_w",
             "home_field", "rest_diff"]
 BASE = "https://api.collegefootballdata.com"
+# use whichever version compare_variants.py picked as most accurate
+if os.path.exists("model_config.json"):
+    _cfg = json.load(open("model_config.json"))
+    FEATURES = _cfg["features"]
+    MODEL_NAME = _cfg["chosen"]
+else:
+    MODEL_NAME = "current"
 
 
 # ---------------------------------------------------------------- 1. refresh current season
@@ -132,6 +139,14 @@ def main():
     if not args.no_pull:
         refresh(con, season)
     con.close()
+    if not args.no_pull:
+        try:
+            import pull_qb
+            sys.argv = ["pull_qb.py", "--season", str(season)]
+            pull_qb.main()
+        except SystemExit as e:
+            print(f"  (QB refresh skipped: {e})")
+    print(f"Model version: {MODEL_NAME}")
 
     print("Rebuilding features...")
     build_features.main()
@@ -172,6 +187,8 @@ def main():
     g["win_pct"] = np.maximum(g["home_prob"], 1 - g["home_prob"])
     g["pick_margin"] = g["pred_margin"].abs()
     g["conf"] = g["home_prob"].apply(confidence)
+    if "qb_override" not in g:
+        g["qb_override"] = 0
     g["flag"] = (g["market_spread"].notna() & (g["market_spread"] != 0)
                  & ((g["market_spread"] < 0) != (g["pred_margin"] > 0)))
     g["kickoff"] = pd.to_datetime(g["start_date"], utc=True).dt.tz_convert(LOCAL_TZ)
@@ -193,7 +210,8 @@ def main():
         kick = r["kickoff"].strftime("%a %I:%M %p") if pd.notna(r["kickoff"]) else "TBD"
         mkt = f"{r['market_spread']:+.1f}" if pd.notna(r["market_spread"]) else "--"
         print(f" {kick:<15}{r['matchup'][:39]:<40}{r['pick'][:21]:<22}{r['win_pct']:>6.0%}"
-              f"{r['pick_margin']:>+8.1f}{mkt:>8}  {r['conf']:<4}{'  !' if r['flag'] else ''}")
+              f"{r['pick_margin']:>+8.1f}{mkt:>8}  {r['conf']:<4}{'  !' if r['flag'] else ''}"
+              f"{'  [QB override]' if r['qb_override'] else ''}")
     print("-" * W)
     counts = g["conf"].value_counts()
     print(f" {len(g)} games | HIGH: {counts.get('HIGH', 0)} | MEDIUM: {counts.get('MED', 0)} | LOW: {counts.get('LOW', 0)}")

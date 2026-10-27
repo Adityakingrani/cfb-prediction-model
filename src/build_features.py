@@ -4,6 +4,8 @@ available before kickoff. Saves to the `features` table in data/cfb.duckdb.
 
 Run from the repo root:  python src\\build_features.py
 """
+import os
+
 import duckdb
 import numpy as np
 import pandas as pd
@@ -14,6 +16,11 @@ DB_PATH = "data/cfb.duckdb"
 PRIOR_GAMES = 4      # how many games of evidence it takes for in-season data to weigh as much as the prior
 RIDGE_ALPHA = 2.0    # shrinkage for opponent-adjusted ratings (higher = more pulled toward average)
 POSTSEASON_OFFSET = 20
+NEW_TEAM_PCTL = 0.10     # teams with no FBS history start near the bottom of FBS (variant "low")
+QB_WINDOW = 24           # QB value = his last 24 games
+QB_SHRINK = 150          # pass attempts of evidence before a QB's own numbers outweigh the prior
+QB_PRIOR = 5.0           # adjusted yards/attempt assumed for a QB with no history (backup level)
+OVERRIDE_FILE = "qb_overrides.csv"
 
 
 # ---------------------------------------------------------------- load
@@ -206,6 +213,98 @@ def rest_days(all_games):
     return long[["game_id", "team", "rest"]].drop_duplicates(["game_id", "team"])
 
 
+# ---------------------------------------------------------------- quarterbacks
+def qb_features(con, g):
+    """QB value (shrunk adjusted yards per attempt over his last games) for each team-game.
+
+    assumed starter = the team's starter in its previous game (what we know before kickoff),
+                      unless qb_overrides.csv names someone else for an upcoming game
+    actual starter  = who actually threw the most passes (only known after the game; backtest upper bound)
+    """
+    cols = ["game_id", "qb_edge", "qb_change", "qb_edge_actual", "qb_change_actual", "home_qb", "away_qb", "qb_override"]
+    if "qb_games" not in {r[0] for r in con.execute("SHOW TABLES").fetchall()}:
+        print("  (no qb_games table yet - run python src\\pull_qb.py; QB features set to 0)")
+        return pd.DataFrame(columns=cols)
+    q = con.execute("SELECT * FROM qb_games WHERE att > 0").df()
+    kick = g[["game_id", "start_date"]]
+    q = q.merge(kick, on="game_id")
+    q["adj"] = q["yds"].fillna(0) + 20 * q["td"].fillna(0) - 45 * q["ints"].fillna(0)
+
+    # one starter per team-game: most pass attempts
+    st = q.sort_values("att", ascending=False).drop_duplicates(["game_id", "team"])
+    st = st[["game_id", "team", "qb_id", "qb_name", "start_date"]]
+
+    # each QB's running history BEFORE every game he played
+    q = q.sort_values(["qb_id", "start_date"])
+    grp = q.groupby("qb_id")
+    roll = lambda s: s.shift().rolling(QB_WINDOW, min_periods=1).sum()
+    q["att_prior"] = grp["att"].transform(roll).fillna(0)
+    q["adj_prior"] = grp["adj"].transform(roll).fillna(0)
+    q["att_after"] = grp["att"].transform(lambda s: s.rolling(QB_WINDOW, min_periods=1).sum())
+    q["adj_after"] = grp["adj"].transform(lambda s: s.rolling(QB_WINDOW, min_periods=1).sum())
+    snap = q[["qb_id", "start_date", "att_after", "adj_after"]].sort_values("start_date").rename(columns={"start_date": "prev_date"})
+    shrink = lambda adj, att: (adj + QB_SHRINK * QB_PRIOR) / (att + QB_SHRINK)
+
+    def value(df):   # df has qb_id, start_date -> value of that QB before that kickoff
+        df = df.dropna(subset=["qb_id", "start_date"]).sort_values("start_date")
+        m = pd.merge_asof(df, snap, left_on="start_date", right_on="prev_date", by="qb_id",
+                          allow_exact_matches=False, direction="backward")
+        return shrink(m["adj_after"].fillna(0), m["att_after"].fillna(0)).values, m
+
+    # every team-game (including upcoming ones) with the team's previous starter
+    long = pd.concat([g[["game_id", "start_date", "home"]].rename(columns={"home": "team"}).assign(side="home"),
+                      g[["game_id", "start_date", "away"]].rename(columns={"away": "team"}).assign(side="away")])
+    long = long.dropna(subset=["start_date"]).sort_values("start_date")
+    prev = st.rename(columns={"start_date": "st_date", "qb_id": "prev_qb", "qb_name": "prev_qb_name"}).drop(columns="game_id")
+    prev = prev.sort_values("st_date")
+    long = pd.merge_asof(long, prev, left_on="start_date", right_on="st_date", by="team",
+                         allow_exact_matches=False, direction="backward")
+    long = long.merge(st[["game_id", "team", "qb_id", "qb_name"]].rename(columns={"qb_id": "act_qb", "qb_name": "act_qb_name"}),
+                      on=["game_id", "team"], how="left")
+
+    # manual overrides for upcoming games
+    long["use_qb"], long["use_name"], long["override"] = long["prev_qb"], long["prev_qb_name"], 0
+    if os.path.exists(OVERRIDE_FILE):
+        o = pd.read_csv(OVERRIDE_FILE).dropna()
+        latest = q.sort_values("start_date").drop_duplicates("qb_name", keep="last").set_index("qb_name")
+        done_ids = set(st["game_id"])
+        for _, row in o.iterrows():
+            name, team = str(row["qb_name"]).strip(), str(row["team"]).strip()
+            if name not in latest.index:
+                print(f"  !! QB override: no QB named '{name}' in the data, skipped")
+                continue
+            mask = (long["team"].str.lower() == team.lower()) & ~long["game_id"].isin(done_ids)
+            if mask.any():   # next game only
+                mask &= long["start_date"] == long.loc[mask, "start_date"].min()
+            if not mask.any():
+                print(f"  !! QB override: no upcoming game for team '{team}', skipped")
+                continue
+            long.loc[mask, ["use_qb", "use_name", "override"]] = [latest.at[name, "qb_id"], name, 1]
+            print(f"  QB override: {team} -> {name}")
+
+    for who in ("prev", "use", "act"):
+        tmp = long[["game_id", "team", "start_date", f"{who}_qb"]].rename(columns={f"{who}_qb": "qb_id"})
+        tmp = tmp.dropna(subset=["qb_id"])
+        vals, m = value(tmp)
+        m[f"{who}_val"] = vals
+        long = long.merge(m[["game_id", "team", f"{who}_val"]], on=["game_id", "team"], how="left")
+    for c in ("prev_val", "use_val", "act_val"):
+        long[c] = long[c].fillna(QB_PRIOR)
+
+    long["chg"] = long["use_val"] - long["prev_val"]
+    long["chg_act"] = long["act_val"] - long["prev_val"]
+    h, a = long[long["side"] == "home"].set_index("game_id"), long[long["side"] == "away"].set_index("game_id")
+    out = pd.DataFrame({
+        "qb_edge": h["use_val"] - a["use_val"],
+        "qb_change": h["chg"] - a["chg"],
+        "qb_edge_actual": h["act_val"].where(h["act_qb"].notna(), h["use_val"]) - a["act_val"].where(a["act_qb"].notna(), a["use_val"]),
+        "qb_change_actual": h["chg_act"].where(h["act_qb"].notna(), 0) - a["chg_act"].where(a["act_qb"].notna(), 0),
+        "home_qb": h["use_name"], "away_qb": a["use_name"],
+        "qb_override": (h["override"] + a["override"]).clip(upper=1),
+    }).reset_index()
+    return out[cols]
+
+
 # ---------------------------------------------------------------- assemble
 def side(df, prefix, team_col):
     return df.rename(columns={c: f"{prefix}_{c}" for c in df.columns if c not in ("season", "period", "team", "game_id")}) \
@@ -228,7 +327,9 @@ def assemble(g, weekly, priors, rest, lines):
                                                     "prev_sp", "ret_ppa", "talent", "rec_4yr")]
     for c in prior_cols:
         f[f"{c}_missing"] = f[c].isna().astype(int)
+        f[f"{c}_low"] = f[c].fillna(f.groupby("season")[c].transform(lambda x: x.quantile(NEW_TEAM_PCTL)))
         f[c] = f[c].fillna(f.groupby("season")[c].transform("mean"))
+        f[f"{c}_low"] = f[f"{c}_low"].fillna(f[c])
     for c in [c for c in f.columns if c[2:] in RATING_COLS]:
         f[c] = f[c].fillna(0.0)
     f[["h_games_played", "a_games_played"]] = f[["h_games_played", "a_games_played"]].fillna(0)
@@ -250,11 +351,21 @@ def assemble(g, weekly, priors, rest, lines):
     f["pr_talent"] = f["h_talent"] - f["a_talent"]
     f["pr_rec"] = f["h_rec_4yr"] - f["a_rec_4yr"]
 
+    L = lambda c: f[f"{c}_low"]
+    f["pr_margin_low"] = L("h_prev_margin_rtg") - L("a_prev_margin_rtg")
+    f["pr_ppa_edge_low"] = (L("h_prev_off_offense_ppa") + L("a_prev_def_offense_ppa")) - (L("a_prev_off_offense_ppa") + L("h_prev_def_offense_ppa"))
+    f["pr_sp_low"] = L("h_prev_sp") - L("a_prev_sp")
+    f["pr_ret_ppa_low"] = L("h_ret_ppa") - L("a_ret_ppa")
+    f["pr_talent_low"] = L("h_talent") - L("a_talent")
+    f["pr_rec_low"] = L("h_rec_4yr") - L("a_rec_4yr")
+    f["new_fbs_game"] = ((f["h_prev_margin_rtg_missing"] + f["a_prev_margin_rtg_missing"]) > 0).astype(int)
+
     w = f["w_inseason"]
     for c in ("in_margin", "in_ppa_edge", "in_sr_edge"):
         f[f"{c}_w"] = f[c] * w
     for c in ("pr_margin", "pr_ppa_edge", "pr_sp", "pr_ret_ppa", "pr_talent", "pr_rec"):
         f[f"{c}_w"] = f[c] * (1 - w)
+        f[f"{c}_w_low"] = f[f"{c}_low"] * (1 - w)
 
     f["home_field"] = (~f["neutral"]).astype(int)
     f["conf_game"] = f["conf_game"].astype(int)
@@ -271,6 +382,8 @@ KEEP = ["game_id", "season", "week", "period", "season_type", "start_date", "hom
         "in_margin_w", "in_ppa_edge_w", "in_sr_edge_w",
         "pr_margin_w", "pr_ppa_edge_w", "pr_sp_w", "pr_ret_ppa_w", "pr_talent_w", "pr_rec_w",
         "home_field", "conf_game", "postseason", "rest_diff", "covid_2020",
+        "pr_margin_w_low", "pr_ppa_edge_w_low", "pr_sp_w_low", "pr_ret_ppa_w_low", "pr_talent_w_low", "pr_rec_w_low",
+        "new_fbs_game", "qb_edge", "qb_change", "qb_edge_actual", "qb_change_actual", "home_qb", "away_qb", "qb_override",
         "market_spread"]
 
 
@@ -306,7 +419,11 @@ def main():
     print("Building week-by-week ratings (only past games each week)...")
     weekly, final = build_ratings(g, tg)
     priors = build_priors(final, sp, ret, talent, recruit)
-    f = assemble(g, weekly, priors, rest_days(all_games), lines)[KEEP]
+    f = assemble(g, weekly, priors, rest_days(all_games), lines)
+    f = f.merge(qb_features(con, g), on="game_id", how="left")
+    for c in ("qb_edge", "qb_change", "qb_edge_actual", "qb_change_actual", "qb_override"):
+        f[c] = pd.to_numeric(f[c], errors="coerce").fillna(0)
+    f = f[KEEP]
 
     con.register("f_df", f)
     con.execute("CREATE OR REPLACE TABLE features AS SELECT * FROM f_df")

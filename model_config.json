@@ -1,0 +1,4 @@
+{
+  "chosen": "qb",
+  "features": ["in_margin_w", "in_ppa_edge_w", "in_sr_edge_w", "pr_margin_w", "pr_ppa_edge_w", "pr_sp_w", "pr_ret_ppa_w", "pr_talent_w", "pr_rec_w", "home_field", "rest_diff", "qb_edge", "qb_change"]
+}
